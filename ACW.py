@@ -3,18 +3,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 from collections import Counter
+from scipy.stats import chisquare, kstest,bernoulli
 
 # ---- Part I: Cellular Automata Movement Simulation ----
 
-def task_1_1():
-    """Simulate movement of a cell on a 100x100 grid (4 directions, 100 steps)."""
+def task_1_1(total_steps=10000, checkpoints=[100, 500, 1000, 5000]):
+    """Simulate movement of a cell with checkpoints for uniformity analysis."""
     grid_size = 100
-    x, y = grid_size // 2, grid_size // 2  # Start at the center of the grid
+    x, y = grid_size // 2, grid_size // 2  # Start at the center
     positions = [(x, y)]
     directions = []
+    step_data = {checkpoint: [] for checkpoint in checkpoints}
 
-    for _ in range(100):
-        rand1, rand2 = random.randint(0, 1), random.randint(0, 1)
+    # Simulate cell movement
+    for step in range(1, total_steps + 1):
+        rand1, rand2 = bernoulli.rvs(0.5), bernoulli.rvs(0.5)  # Generate random directions
         if rand1 == 1 and rand2 == 1:
             y = max(0, y - 1)  # Move up
             directions.append("Up")
@@ -29,27 +32,55 @@ def task_1_1():
             directions.append("Right")
         positions.append((x, y))
 
-    x_positions, y_positions = zip(*positions)
+        if step in checkpoints:
+            step_data[step] = Counter(directions).copy()
 
-    # Plot movement and direction distribution
-    plt.figure(figsize=(10, 5))
-    plt.subplot(1, 2, 1)
-    plt.plot(x_positions, y_positions, marker='o', linestyle='-', markersize=4)
-    plt.title("Cell Movement on 100x100 Grid (100 Steps)")
-    plt.xlabel("X Position")
-    plt.ylabel("Y Position")
-    plt.grid(True)
+    # Analyze results for each checkpoint
+    for step, counts in step_data.items():
+        # Plot cell movement and direction distribution
+        x_positions, y_positions = zip(*positions[:step])
+        plt.figure(figsize=(10, 5))
+        plt.subplot(1, 2, 1)
+        plt.plot(x_positions, y_positions, marker='o', linestyle='-', markersize=2)
+        plt.title(f"Cell Movement (First {step} Steps)")
+        plt.xlabel("X Position")
+        plt.ylabel("Y Position")
+        plt.grid(True)
 
-    direction_counts = Counter(directions)
-    plt.subplot(1, 2, 2)
-    plt.bar(direction_counts.keys(), direction_counts.values(), color='orange')
-    plt.title("Direction Distribution (100 Steps)")
-    plt.xlabel("Direction")
-    plt.ylabel("Frequency")
-    plt.grid(True)
+        plt.subplot(1, 2, 2)
+        plt.bar(counts.keys(), counts.values(), color='orange')
+        plt.title(f"Direction Distribution (First {step} Steps)")
+        plt.xlabel("Direction")
+        plt.ylabel("Frequency")
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
 
-    plt.tight_layout()
-    plt.show()
+        # Perform chi-squared test
+        observed = [counts.get(direction, 0) for direction in ["Up", "Down", "Left", "Right"]]
+        expected = [step / 4] * 4  # Uniform distribution expectation
+        chi2, p_value = chisquare(f_obs=observed, f_exp=expected)
+
+        # Print chi-squared results
+        print(f"Checkpoint: {step} Steps")
+        print(f"Observed Frequencies: {observed}")
+        print(f"Expected Frequencies: {expected}")
+        print(f"Chi-Squared Statistic: {chi2:.4f}, p-value: {p_value:.4f}")
+        if p_value > 0.05:
+            print("Result: The data is consistent with a uniform distribution (p > 0.05).\n")
+        else:
+            print("Result: The data significantly deviates from a uniform distribution (p ≤ 0.05).\n")
+
+        # Perform Kolmogorov-Smirnov test for uniform distribution
+        observed_probabilities = [counts.get(direction, 0) / step for direction in ["Up", "Down", "Left", "Right"]]
+        ks_statistic, ks_p_value = kstest(observed_probabilities, 'uniform')
+
+        # Print KS test results
+        print(f"KS Statistic: {ks_statistic:.4f}, p-value: {ks_p_value:.4f}")
+        if ks_p_value > 0.05:
+            print("Result: The data is consistent with a uniform distribution (p > 0.05) according to the KS test.\n")
+        else:
+            print("Result: The data significantly deviates from a uniform distribution (p ≤ 0.05) according to the KS test.\n")
 
 def task_1_2():
     """Simulate movement in 8 directions for 1000 and 10000 steps."""
@@ -72,7 +103,8 @@ def task_1_2():
         directions = []
 
         for _ in range(step_count):
-            direction = random.randint(0, 7)
+            # Generate a random integer between 0 and 7
+            direction = bernoulli.rvs(0.5, size=3).dot([1, 2, 4])  # Binary to integer for 8 directions
             dx, dy = moves[direction]
             x = min(max(0, x + dx), grid_size - 1)
             y = min(max(0, y + dy), grid_size - 1)
