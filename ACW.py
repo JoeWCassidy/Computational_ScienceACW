@@ -3,21 +3,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 from collections import Counter
-from scipy.stats import chisquare, kstest,bernoulli
+from scipy import stats
+from scipy.stats import chisquare, kstest, bernoulli,chi2
+from concurrent.futures import ThreadPoolExecutor
+
 
 # ---- Part I: Cellular Automata Movement Simulation ----
 
-def task_1_1(total_steps=10000, checkpoints=[100, 500, 1000, 5000]):
+def task_1_1(total_steps=100, checkpoints=[10, 25, 50, 100], run_id=1):
     """Simulate movement of a cell with checkpoints for uniformity analysis."""
     grid_size = 100
     x, y = grid_size // 2, grid_size // 2  # Start at the center
     positions = [(x, y)]
     directions = []
     step_data = {checkpoint: [] for checkpoint in checkpoints}
-
+    
     # Simulate cell movement
     for step in range(1, total_steps + 1):
-        rand1, rand2 = bernoulli.rvs(0.5), bernoulli.rvs(0.5)  # Generate random directions
+        rand1, rand2 = np.random.choice([0, 1], size=2)  # Generate random directions
         if rand1 == 1 and rand2 == 1:
             y = max(0, y - 1)  # Move up
             directions.append("Up")
@@ -35,52 +38,93 @@ def task_1_1(total_steps=10000, checkpoints=[100, 500, 1000, 5000]):
         if step in checkpoints:
             step_data[step] = Counter(directions).copy()
 
-    # Analyze results for each checkpoint
-    for step, counts in step_data.items():
-        # Plot cell movement and direction distribution
-        x_positions, y_positions = zip(*positions[:step])
-        plt.figure(figsize=(10, 5))
-        plt.subplot(1, 2, 1)
-        plt.plot(x_positions, y_positions, marker='o', linestyle='-', markersize=2)
-        plt.title(f"Cell Movement (First {step} Steps)")
-        plt.xlabel("X Position")
-        plt.ylabel("Y Position")
-        plt.grid(True)
+    # Return the simulation data to be used for plotting later
+    return run_id, positions, step_data
 
-        plt.subplot(1, 2, 2)
-        plt.bar(counts.keys(), counts.values(), color='orange')
-        plt.title(f"Direction Distribution (First {step} Steps)")
-        plt.xlabel("Direction")
-        plt.ylabel("Frequency")
-        plt.grid(True)
-        plt.tight_layout()
-        plt.show()
+def run_multiple_simulations():
+    """Run three simulations of task_1_1 concurrently to reduce bias."""
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = [executor.submit(task_1_1, run_id=i) for i in range(1, 4)]
+        results = [future.result() for future in futures]  # Collect results for all runs
+    return results  # Return all simulation results
 
-        # Perform chi-squared test
-        observed = [counts.get(direction, 0) for direction in ["Up", "Down", "Left", "Right"]]
-        expected = [step / 4] * 4  # Uniform distribution expectation
-        chi2, p_value = chisquare(f_obs=observed, f_exp=expected)
+def plot_simulation_results(results):
+    """Plot the results for all runs after they are finished."""
+    for run_id, positions, step_data in results:
+        for step, counts in step_data.items():
+            # Plot cell movement and direction distribution
+            x_positions, y_positions = zip(*positions[:step])
 
-        # Print chi-squared results
-        print(f"Checkpoint: {step} Steps")
-        print(f"Observed Frequencies: {observed}")
-        print(f"Expected Frequencies: {expected}")
-        print(f"Chi-Squared Statistic: {chi2:.4f}, p-value: {p_value:.4f}")
-        if p_value > 0.05:
-            print("Result: The data is consistent with a uniform distribution (p > 0.05).\n")
-        else:
-            print("Result: The data significantly deviates from a uniform distribution (p ≤ 0.05).\n")
+            # Create a figure with a 2x2 grid of subplots
+            fig, axs = plt.subplots(2, 2, figsize=(12, 10))  # 2 rows, 2 columns
 
-        # Perform Kolmogorov-Smirnov test for uniform distribution
-        observed_probabilities = [counts.get(direction, 0) / step for direction in ["Up", "Down", "Left", "Right"]]
-        ks_statistic, ks_p_value = kstest(observed_probabilities, 'uniform')
+            # Plot movement (first subplot)
+            axs[0, 0].plot(x_positions, y_positions, marker='o', linestyle='-', markersize=2)
+            axs[0, 0].set_title(f"Cell Movement (Run {run_id} - First {step} Steps)")
+            axs[0, 0].set_xlabel("X Position")
+            axs[0, 0].set_ylabel("Y Position")
+            axs[0, 0].grid(True)
 
-        # Print KS test results
-        print(f"KS Statistic: {ks_statistic:.4f}, p-value: {ks_p_value:.4f}")
-        if ks_p_value > 0.05:
-            print("Result: The data is consistent with a uniform distribution (p > 0.05) according to the KS test.\n")
-        else:
-            print("Result: The data significantly deviates from a uniform distribution (p ≤ 0.05) according to the KS test.\n")
+            # Plot direction distribution and Chi-Squared Test (Observed vs Expected) in the same graph
+            observed = [counts.get(direction, 0) for direction in ["Up", "Down", "Left", "Right"]]
+            expected = [step / 4] * 4  # Uniform distribution expectation
+            axs[0, 1].bar(counts.keys(), observed, color='orange', label="Observed")
+            axs[0, 1].axhline(y=expected[0], color='r', linestyle='--', label="Expected (Uniform)")
+            axs[0, 1].set_title(f"Direction Distribution and Chi-Squared Test (Checkpoint {step})")
+            axs[0, 1].set_xlabel("Direction")
+            axs[0, 1].set_ylabel("Frequency")
+            axs[0, 1].legend()
+            axs[0, 1].grid(True)
+
+            # Perform chi-squared test and print the results
+            chi2_stat, p_value = chisquare(f_obs=observed, f_exp=expected)
+            print(f"\nChi-Squared Test Results (Run {run_id}, Checkpoint {step}):")
+            print(f"Observed Frequencies: {observed}")
+            print(f"Expected Frequencies: {expected}")
+            print(f"Chi-Squared Statistic: {chi2_stat:.4f}, p-value: {p_value:.4f}")
+            if p_value > 0.05:
+                print("Result: The data is consistent with a uniform distribution (p > 0.05).")
+            else:
+                print("Result: The data significantly deviates from a uniform distribution (p ≤ 0.05).")
+
+            # Chi-Squared Distribution plot with test statistic (third subplot)
+            df = len(observed) - 1  # Degrees of freedom
+            x_vals = np.linspace(0, 10, 1000)
+            y_vals = chi2.pdf(x_vals, df)
+            axs[1, 0].plot(x_vals, y_vals, label=f'Chi-Squared Distribution (df={df})')
+            axs[1, 0].fill_between(x_vals, y_vals, where=(x_vals >= chi2_stat), color='r', alpha=0.5, label='Critical Region')
+            axs[1, 0].axvline(chi2_stat, color='k', linestyle='--', label=f'Test Statistic = {chi2_stat:.4f}')
+            axs[1, 0].legend()
+            axs[1, 0].set_title(f"Chi-Squared Distribution with Test Statistic (Checkpoint {step})")
+            axs[1, 0].set_xlabel('Chi-Squared Value')
+            axs[1, 0].set_ylabel('Density')
+            axs[1, 0].grid(True)
+
+            # Perform Kolmogorov-Smirnov test and print the results
+            observed_probabilities = [counts.get(direction, 0) / step for direction in ["Up", "Down", "Left", "Right"]]
+            ks_statistic, ks_p_value = kstest(observed_probabilities, 'uniform')
+            print(f"\nKolmogorov-Smirnov Test Results (Run {run_id}, Checkpoint {step}):")
+            print(f"KS Statistic: {ks_statistic:.4f}, p-value: {ks_p_value:.4f}")
+            if ks_p_value > 0.05:
+                print("Result: The data is consistent with a uniform distribution (p > 0.05) according to the KS test.")
+            else:
+                print("Result: The data significantly deviates from a uniform distribution (p ≤ 0.05) according to the KS test.")
+
+            # KS Test (CDF plot) and KS Statistic (fourth subplot)
+            uniform_cdf = np.cumsum([1/4] * 4)  # Uniform distribution CDF
+            observed_cdf = np.cumsum(observed_probabilities)
+
+            axs[1, 1].plot(["Up", "Down", "Left", "Right"], observed_cdf, label="Observed CDF", color='b', marker='o')
+            axs[1, 1].plot(["Up", "Down", "Left", "Right"], uniform_cdf, label="Expected CDF (Uniform)", color='r', linestyle='--')
+            axs[1, 1].set_title(f"KS Test: CDF of Observed vs Expected (Checkpoint {step})")
+            axs[1, 1].set_xlabel("Direction")
+            axs[1, 1].set_ylabel("CDF")
+            axs[1, 1].legend()
+            axs[1, 1].grid(True)
+
+            # Automatically adjust layout to avoid overlapping elements
+            plt.tight_layout()
+            plt.show()
 
 def task_1_2():
     """Simulate movement in 8 directions for 1000 and 10000 steps."""
@@ -213,9 +257,11 @@ def menu():
         try:
             choice = int(input("Enter your choice: "))
             if choice == 1:
-                task_1_1()
+                results = run_multiple_simulations()  # Run the simulation with multiple runs
+                plot_simulation_results(results)
             elif choice == 2:
                 task_1_2()
+
             elif choice == 3:
                 task_2_1()
             elif choice == 4:
