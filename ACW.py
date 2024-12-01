@@ -6,7 +6,33 @@ from collections import Counter
 from scipy import stats
 from scipy.stats import chisquare, kstest, bernoulli,chi2
 from concurrent.futures import ThreadPoolExecutor
+import os
 
+def save_results_to_file(filename, content):
+    with open(filename, 'a') as f:
+        f.write(content + "\n")
+
+def save_ks_results(output_file, run_id, step, ks_statistic, ks_p_value):
+    result_text = (
+        f"Kolmogorov-Smirnov Test Results (Run {run_id}, Checkpoint {step}):\n"
+        f"KS Statistic: {ks_statistic:.4f}, p-value: {ks_p_value:.4f}\n"
+        f"Result: The data is {'consistent with' if ks_p_value > 0.05 else 'not consistent with'} a uniform distribution "
+        f"(p {'>' if ks_p_value > 0.05 else '<'} 0.05) according to the KS test.\n\n"
+    )
+    with open(output_file, "a") as file:
+        file.write(result_text)
+
+def save_chi2_results(output_file, run_id, step, observed, expected, chi2_stat, p_value):
+    result_text = (
+        f"Chi-Squared Test Results (Run {run_id}, Checkpoint {step}):\n"
+        f"Observed Frequencies: {observed}\n"
+        f"Expected Frequencies: {expected}\n"
+        f"Chi-Squared Statistic: {chi2_stat:.4f}, p-value: {p_value:.4f}\n"
+        f"Result: The data is {'consistent with' if p_value > 0.05 else 'not consistent with'} a uniform distribution "
+        f"(p {'>' if p_value > 0.05 else '<'} 0.05).\n\n"
+    )
+    with open(output_file, "a") as file:
+        file.write(result_text)
 
 # ---- Part I: Cellular Automata Movement Simulation ----
 
@@ -17,22 +43,25 @@ def task_1_1(total_steps=100, checkpoints=[10, 25, 50, 100], run_id=1):
     positions = [(x, y)]
     directions = []
     step_data = {checkpoint: [] for checkpoint in checkpoints}
-    
+
     # Simulate cell movement
     for step in range(1, total_steps + 1):
-        rand1, rand2 = np.random.choice([0, 1], size=2)  # Generate random directions
-        if rand1 == 1 and rand2 == 1:
+        rand1, rand2 = np.random.uniform(0, 1, size=2)  # Generate random floats in range [0, 1)
+        
+        # Determine movement direction based on thresholds
+        if rand1 > 0.5 and rand2 > 0.5:
             y = max(0, y - 1)  # Move up
             directions.append("Up")
-        elif rand1 == 1 and rand2 == 0:
+        elif rand1 > 0.5 and rand2 <= 0.5:
             y = min(grid_size - 1, y + 1)  # Move down
             directions.append("Down")
-        elif rand1 == 0 and rand2 == 1:
+        elif rand1 <= 0.5 and rand2 > 0.5:
             x = max(0, x - 1)  # Move left
             directions.append("Left")
-        elif rand1 == 0 and rand2 == 0:
+        elif rand1 <= 0.5 and rand2 <= 0.5:
             x = min(grid_size - 1, x + 1)  # Move right
             directions.append("Right")
+        
         positions.append((x, y))
 
         if step in checkpoints:
@@ -41,15 +70,20 @@ def task_1_1(total_steps=100, checkpoints=[10, 25, 50, 100], run_id=1):
     # Return the simulation data to be used for plotting later
     return run_id, positions, step_data
 
-def run_multiple_simulations():
-    """Run three simulations of task_1_1 concurrently to reduce bias."""
+
+def run_multiple_simulations(save_to_file=True):
+    """Run three simulations of task_1_1 concurrently to reduce bias and optionally save results."""
     with ThreadPoolExecutor(max_workers=3) as executor:
         futures = [executor.submit(task_1_1, run_id=i) for i in range(1, 4)]
         results = [future.result() for future in futures]  # Collect results for all runs
-    return results  # Return all simulation results
+    return results
 
-def plot_simulation_results(results):
+def plot_simulation_results(results, output_file="simulation_results_task_1_1.txt"):
+
     """Plot the results for all runs after they are finished."""
+    if os.path.exists(output_file):
+        os.remove(output_file)  # Clear the file before writing
+
     for run_id, positions, step_data in results:
         for step, counts in step_data.items():
             # Plot cell movement and direction distribution
@@ -86,6 +120,7 @@ def plot_simulation_results(results):
                 print("Result: The data is consistent with a uniform distribution (p > 0.05).")
             else:
                 print("Result: The data significantly deviates from a uniform distribution (p ≤ 0.05).")
+            
 
             # Chi-Squared Distribution plot with test statistic (third subplot)
             df = len(observed) - 1  # Degrees of freedom
@@ -125,6 +160,11 @@ def plot_simulation_results(results):
             # Automatically adjust layout to avoid overlapping elements
             plt.tight_layout()
             plt.show()
+            save_ks_results(output_file, run_id, step, ks_statistic, ks_p_value)
+
+            # Save Chi-Squared Test Results
+            save_chi2_results(output_file, run_id, step, observed, expected, chi2_stat, p_value)
+
 
 def task_1_2(total_steps=10000, checkpoints=[1000, 10000], run_id=1):
     """Simulate movement in 8 directions for 1000 and 10000 steps with checkpoints for uniformity analysis."""
@@ -137,36 +177,40 @@ def task_1_2(total_steps=10000, checkpoints=[1000, 10000], run_id=1):
         (1, 0), (-1, 0), (0, 1), (0, -1),
         (1, 1), (-1, 1), (1, -1), (-1, -1)
     ]
-    
+
     x, y = grid_size // 2, grid_size // 2  # Start at the center
     positions = [(x, y)]
     directions = []
     step_data = {checkpoint: [] for checkpoint in checkpoints}
-    
+
     # Simulate cell movement
     for step in range(1, total_steps + 1):
-        direction = np.random.choice(range(8))  # Randomly select one of the 8 directions
+        rand = np.random.uniform(0, 1)  # Generate a single random float in range [0, 1)
+        direction = int(rand * 8)  # Map the float to one of 8 directions (0 to 7)
         dx, dy = moves[direction]
         x = min(max(0, x + dx), grid_size - 1)
         y = min(max(0, y + dy), grid_size - 1)
         directions.append(directions_map[direction])
         positions.append((x, y))
-        
+
         if step in checkpoints:
             step_data[step] = Counter(directions).copy()
 
     # Return the simulation data and directions_map for further processing
     return run_id, positions, step_data, directions_map
-
-def run_multiple_simulations_8():
-    """Run three simulations of task_1_2 concurrently to reduce bias."""
+def run_multiple_simulations_8(save_to_file=True):
+    """Run three simulations of task_1_2 concurrently to reduce bias and optionally save results."""
     with ThreadPoolExecutor(max_workers=3) as executor:
         futures = [executor.submit(task_1_2, run_id=i) for i in range(1, 4)]
-        results = [future.result() for future in futures]  # Collect results for all runs
+        results = [future.result() for future in futures]  # Collect results for all runs    
     return results  # Return all simulation results
 
-def plot_simulation_results_8(results):
+
+def plot_simulation_results_8(results, output_file="simulation_results_task_1_2.txt"):
     """Plot the results for all runs after they are finished."""
+    if os.path.exists(output_file):
+        os.remove(output_file)  # Clear the file before writing
+
     for run_id, positions, step_data, directions_map in results:
         for step, counts in step_data.items():
             # Plot cell movement and direction distribution
@@ -248,8 +292,13 @@ def plot_simulation_results_8(results):
             # Automatically adjust layout to avoid overlapping elements
             plt.tight_layout()
             plt.show()
+            save_ks_results(output_file, run_id, step, ks_statistic, ks_p_value)
+
+            # Save Chi-Squared Test Results
+            save_chi2_results(output_file, run_id, step, observed, expected, chi2_stat, p_value)
 
 
+        
 def task_2_1():
     """Simulate tumor growth using the Gompertz model."""
     k = 0.006

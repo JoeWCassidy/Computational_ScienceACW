@@ -1,0 +1,120 @@
+Kolmogorov-Smirnov Test Results (Run 1, Checkpoint 10):
+KS Statistic: 0.5500, p-value: 0.1172
+Result: The data is consistent with a uniform distribution (p > 0.05) according to the KS test.
+
+Chi-Squared Test Results (Run 1, Checkpoint 10):
+Observed Frequencies: [1, 2, 5, 2]
+Expected Frequencies: [2.5, 2.5, 2.5, 2.5]
+Chi-Squared Statistic: 3.6000, p-value: 0.3080
+Result: The data is consistent with a uniform distribution (p > 0.05).
+
+Kolmogorov-Smirnov Test Results (Run 1, Checkpoint 25):
+KS Statistic: 0.6000, p-value: 0.0674
+Result: The data is consistent with a uniform distribution (p > 0.05) according to the KS test.
+
+Chi-Squared Test Results (Run 1, Checkpoint 25):
+Observed Frequencies: [6, 4, 10, 5]
+Expected Frequencies: [6.25, 6.25, 6.25, 6.25]
+Chi-Squared Statistic: 3.3200, p-value: 0.3449
+Result: The data is consistent with a uniform distribution (p > 0.05).
+
+Kolmogorov-Smirnov Test Results (Run 1, Checkpoint 50):
+KS Statistic: 0.7000, p-value: 0.0169
+Result: The data is not consistent with a uniform distribution (p < 0.05) according to the KS test.
+
+Chi-Squared Test Results (Run 1, Checkpoint 50):
+Observed Frequencies: [15, 11, 15, 9]
+Expected Frequencies: [12.5, 12.5, 12.5, 12.5]
+Chi-Squared Statistic: 2.1600, p-value: 0.5399
+Result: The data is consistent with a uniform distribution (p > 0.05).
+
+Kolmogorov-Smirnov Test Results (Run 1, Checkpoint 100):
+KS Statistic: 0.7200, p-value: 0.0124
+Result: The data is not consistent with a uniform distribution (p < 0.05) according to the KS test.
+
+Chi-Squared Test Results (Run 1, Checkpoint 100):
+Observed Frequencies: [24, 22, 28, 26]
+Expected Frequencies: [25.0, 25.0, 25.0, 25.0]
+Chi-Squared Statistic: 0.8000, p-value: 0.8495
+Result: The data is consistent with a uniform distribution (p > 0.05).
+
+Kolmogorov-Smirnov Test Results (Run 2, Checkpoint 10):
+KS Statistic: 0.6000, p-value: 0.0674
+Result: The data is consistent with a uniform distribution (p > 0.05) according to the KS test.
+
+Chi-Squared Test Results (Run 2, Checkpoint 10):
+Observed Frequencies: [4, 1, 4, 1]
+Expected Frequencies: [2.5, 2.5, 2.5, 2.5]
+Chi-Squared Statistic: 3.6000, p-value: 0.3080
+Result: The data is consistent with a uniform distribution (p > 0.05).
+
+Kolmogorov-Smirnov Test Results (Run 2, Checkpoint 25):
+KS Statistic: 0.6400, p-value: 0.0404
+Result: The data is not consistent with a uniform distribution (p < 0.05) according to the KS test.
+
+Chi-Squared Test Results (Run 2, Checkpoint 25):
+Observed Frequencies: [8, 4, 9, 4]
+Expected Frequencies: [6.25, 6.25, 6.25, 6.25]
+Chi-Squared Statistic: 3.3200, p-value: 0.3449
+Result: The data is consistent with a uniform distribution (p > 0.05).
+
+Kolmogorov-Smirnov Test Results (Run 2, Checkpoint 50):
+KS Statistic: 0.6000, p-value: 0.0674
+Result: The data is consistent with a uniform distribution (p > 0.05) according to the KS test.
+
+Chi-Squared Test Results (Run 2, Checkpoint 50):
+Observed Frequencies: [14, 8, 20, 8]
+Expected Frequencies: [12.5, 12.5, 12.5, 12.5]
+Chi-Squared Statistic: 7.9200, p-value: 0.0477
+Result: The data is not consistent with a uniform distribution (p < 0.05).
+
+Kolmogorov-Smirnov Test Results (Run 2, Checkpoint 100):
+KS Statistic: 0.7200, p-value: 0.0124
+Result: The data is not consistent with a uniform distribution (p < 0.05) according to the KS test.
+
+Chi-Squared Test Results (Run 2, Checkpoint 100):
+Observed Frequencies: [28, 19, 27, 26]
+Expected Frequencies: [25.0, 25.0, 25.0, 25.0]
+Chi-Squared Statistic: 2.0000, p-value: 0.5724
+Result: The data is consistent with a uniform distribution (p > 0.05).
+
+Kolmogorov-Smirnov Test Results (Run 3, Checkpoint 10):
+KS Statistic: 0.6000, p-value: 0.0674
+Result: The data is consistent with a uniform distribution (p > 0.05) according to the KS test.
+
+Chi-Squared Test Results (Run 3, Checkpoint 10):
+Observed Frequencies: [3, 4, 1, 2]
+Expected Frequencies: [2.5, 2.5, 2.5, 2.5]
+Chi-Squared Statistic: 2.0000, p-value: 0.5724
+Result: The data is consistent with a uniform distribution (p > 0.05).
+
+Kolmogorov-Smirnov Test Results (Run 3, Checkpoint 25):
+KS Statistic: 0.6800, p-value: 0.0228
+Result: The data is not consistent with a uniform distribution (p < 0.05) according to the KS test.
+
+Chi-Squared Test Results (Run 3, Checkpoint 25):
+Observed Frequencies: [8, 8, 3, 6]
+Expected Frequencies: [6.25, 6.25, 6.25, 6.25]
+Chi-Squared Statistic: 2.6800, p-value: 0.4436
+Result: The data is consistent with a uniform distribution (p > 0.05).
+
+Kolmogorov-Smirnov Test Results (Run 3, Checkpoint 50):
+KS Statistic: 0.6200, p-value: 0.0526
+Result: The data is consistent with a uniform distribution (p > 0.05) according to the KS test.
+
+Chi-Squared Test Results (Run 3, Checkpoint 50):
+Observed Frequencies: [13, 19, 8, 10]
+Expected Frequencies: [12.5, 12.5, 12.5, 12.5]
+Chi-Squared Statistic: 5.5200, p-value: 0.1374
+Result: The data is consistent with a uniform distribution (p > 0.05).
+
+Kolmogorov-Smirnov Test Results (Run 3, Checkpoint 100):
+KS Statistic: 0.7100, p-value: 0.0145
+Result: The data is not consistent with a uniform distribution (p < 0.05) according to the KS test.
+
+Chi-Squared Test Results (Run 3, Checkpoint 100):
+Observed Frequencies: [23, 29, 25, 23]
+Expected Frequencies: [25.0, 25.0, 25.0, 25.0]
+Chi-Squared Statistic: 0.9600, p-value: 0.8109
+Result: The data is consistent with a uniform distribution (p > 0.05).
+

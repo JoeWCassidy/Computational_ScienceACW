@@ -1,0 +1,89 @@
+Report structure and contents for 600093 – computational science ACW
+
+Preamble
+The assignment is focussed on how you can create complex systems (and simulations)
+from a set of relatively simple simulations. Hence the 3 parts – which appear to be
+disconnected but are not. This is a very simplified simulation of propagation of the
+tumour -without boundary conditions which determine some choice of the direction of
+growth
+Code
+You have to write code (their own) – you have been given outline (both code and pseudo
+code (in algorithmic form) in class (on ppt slides) and have experienced free-lba
+sessions.
+
+Report Structure
+Write the report like a paper – with an introduction (along the lines of the preamble) and
+outline the stages (briefly).
+The focus should be on distributions, laws of large numbers, complexity and accuracy.
+How all of these work together and the compromises.
+
+Task 1.1
+This is fairly straightforward.
+The definitions for uniform, normal, Bernoulli distributions (or any others – but the two
+should include uniform distribution) –fairly straight forward
+You have been give code on similar random number generations like for e.g coin tossing
+and the throw of a dice. And in week 1 you counted the numbers to find out about the
+distributions and the number of tries before the distributions become real uniform or
+normal. (this part is useful for the second half of 1.1)
+
+The results here should be fairly straightforward. But the reasoning they should be giving
+for the results is the key
+If there are getting a bias in the movement – you need to say why? This will
+happen for few tries of the movement. If they increase the number of tries the
+distributions become more uniform.
+
+IT should be noted (and you have been told this in the lab) – that lets say you
+have 3 runs – 100 moves, 500 moves, and 10000 moves. If they are 3 sperate runs
+then the bias doesnot fully disappear it exists (you don’t get anything close to
+25% for each direction). The reason is that you are initializing the random
+number generation for every run If you then put it all in one look for say 10000
+moves and extract the information at 100, and 500, 1000, 5000, - they will get the
+trend right and the uniformity becomes more apparent. And commenting on the
+complexity
+
+Task 1.2
+(a) Here it is similar to the above. You have been given partial pseudo code – which
+you will need to ingrate with Task 1.1. Please donot ignore (or donot read the
+spec properly and plough on – and get only diagonal movements). This part is
+interesting – there are a few ways of implementing the choice of directions, each
+has a different level of complexity. However the marking reflects more on the
+reasoning than the code itself – please give the pseudo code and code and,
+comment on other variations of implementation and complexity
+in this section is to be able to pick 3 points common in the movement in task 1.1
+and task 1.2. Talk about the steps it took to reach these points, and the
+computational efficiency in each case. Ofcourse, again if they can comment on
+the fact that random numbers are used and that a true expected difference could
+be evaluated only for a larger set of points.
+Task 2.1
+In week 2 (a free lab session) and in class you have been given told about Euler’s
+method. How the error in simulation is a function of h (and they have been directed to
+read up further on this), and that the complexity is O(1) or a function of h depending on
+how they code it the simulation. This choice is implicit in the data given in task 2.1. If
+you take the final steady state time tf=1200, and T0=0, then number of steps is 1200/h,
+and run it for these many steps, if you don’t do this but keep integrating it step by step
+(incrementing t) till they test for Steady state, or time they get another variation. I expect
+then to comment on the simulation results. you would need to show on the graph what
+is the steady state value and why/how they got it. Last year many students simply add
+this to the graph and did not say why – here if the students suggest at steady state M +N
+then ln(M/N) = 0 so DN/DT= 0 hence steady state and so having capacity on the graph
+should be good. They would need to also highlight why there will be an error between M
+and the steady state value of N in the simulation – if you mention just h then its good. If
+you suggest that this error is a function of (machine epsilon)/h (machine precision) its
+better.
+
+Task 2.2
+Note: some of what was discussed above is relevant to this section,
+Before you start – you need to show what happens if M changes. I have asked you to
+look at the time it takes to reach 66% of the final value (or M) and comment on it. There
+should be small variation in the time (which is often a function of h)
+This is the big part. You need to combine the parts for this. You will need to combine the
+code section and run it. While running it you would need to ensure that the tumor does
+not go back on itself and that the relevant squares in the grid are made ungoable. IF
+there is a bias in the movement why is this the case
+Then you have two choices – you can reset the grid cell to initial conditions for the
+numerical integration after every movement, or simply translate and assume full
+growth. Both are equally valid in this case – as all boundary conditions are uniform etc).
+However for the running of the code it change sthe complexity. You need to be able to
+comment on this.
+
+
