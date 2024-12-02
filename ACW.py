@@ -43,6 +43,7 @@ def task_1_1(total_steps=100, checkpoints=[10, 25, 50, 100], run_id=1):
     positions = [(x, y)]
     directions = []
     step_data = {checkpoint: [] for checkpoint in checkpoints}
+    
 
     # Simulate cell movement
     for step in range(1, total_steps + 1):
