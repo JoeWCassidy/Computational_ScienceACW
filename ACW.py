@@ -12,15 +12,6 @@ def save_results_to_file(filename, content):
     with open(filename, 'a') as f:
         f.write(content + "\n")
 
-def save_ks_results(output_file, run_id, step, ks_statistic, ks_p_value):
-    result_text = (
-        f"Kolmogorov-Smirnov Test Results (Run {run_id}, Checkpoint {step}):\n"
-        f"KS Statistic: {ks_statistic:.4f}, p-value: {ks_p_value:.4f}\n"
-        f"Result: The data is {'consistent with' if ks_p_value > 0.05 else 'not consistent with'} a uniform distribution "
-        f"(p {'>' if ks_p_value > 0.05 else '<'} 0.05) according to the KS test.\n\n"
-    )
-    with open(output_file, "a") as file:
-        file.write(result_text)
 
 def save_chi2_results(output_file, run_id, step, observed, expected, chi2_stat, p_value):
     result_text = (
@@ -36,9 +27,9 @@ def save_chi2_results(output_file, run_id, step, observed, expected, chi2_stat, 
 
 # ---- Part I: Cellular Automata Movement Simulation ----
 
-def task_1_1(total_steps=100, checkpoints=[10, 25, 50, 100], run_id=1):
+def task_1_1(total_steps=10000, checkpoints=[100,10000], run_id=1):
     """Simulate movement of a cell with checkpoints for uniformity analysis."""
-    grid_size = 100
+    grid_size = 10000
     x, y = grid_size // 2, grid_size // 2  # Start at the center
     positions = [(x, y)]
     directions = []
@@ -91,7 +82,7 @@ def plot_simulation_results(results, output_file="simulation_results_task_1_1.tx
             x_positions, y_positions = zip(*positions[:step])
 
             # Create a figure with a 2x2 grid of subplots
-            fig, axs = plt.subplots(2, 2, figsize=(12, 10))  # 2 rows, 2 columns
+            fig, axs = plt.subplots(2,2, figsize=(12, 10))  # 2 rows, 2 columns
 
             # Plot movement (first subplot)
             axs[0, 0].plot(x_positions, y_positions, marker='o', linestyle='-', markersize=2)
@@ -135,39 +126,19 @@ def plot_simulation_results(results, output_file="simulation_results_task_1_1.tx
             axs[1, 0].set_xlabel('Chi-Squared Value')
             axs[1, 0].set_ylabel('Density')
             axs[1, 0].grid(True)
-
-            # Perform Kolmogorov-Smirnov test and print the results
-            observed_probabilities = [counts.get(direction, 0) / step for direction in ["Up", "Down", "Left", "Right"]]
-            ks_statistic, ks_p_value = kstest(observed_probabilities, 'uniform')
-            print(f"\nKolmogorov-Smirnov Test Results (Run {run_id}, Checkpoint {step}):")
-            print(f"KS Statistic: {ks_statistic:.4f}, p-value: {ks_p_value:.4f}")
-            if ks_p_value > 0.05:
-                print("Result: The data is consistent with a uniform distribution (p > 0.05) according to the KS test.")
-            else:
-                print("Result: The data significantly deviates from a uniform distribution (p ≤ 0.05) according to the KS test.")
-
-            # KS Test (CDF plot) and KS Statistic (fourth subplot)
-            uniform_cdf = np.cumsum([1/4] * 4)  # Uniform distribution CDF
-            observed_cdf = np.cumsum(observed_probabilities)
-
-            axs[1, 1].plot(["Up", "Down", "Left", "Right"], observed_cdf, label="Observed CDF", color='b', marker='o')
-            axs[1, 1].plot(["Up", "Down", "Left", "Right"], uniform_cdf, label="Expected CDF (Uniform)", color='r', linestyle='--')
-            axs[1, 1].set_title(f"KS Test: CDF of Observed vs Expected (Checkpoint {step})")
-            axs[1, 1].set_xlabel("Direction")
-            axs[1, 1].set_ylabel("CDF")
-            axs[1, 1].legend()
-            axs[1, 1].grid(True)
+ 
 
             # Automatically adjust layout to avoid overlapping elements
+            # Hide the 4th subplot (1, 1)
+            axs[1, 1].axis('off')  # Hides the subplot (1, 1)
             plt.tight_layout()
             plt.show()
-            save_ks_results(output_file, run_id, step, ks_statistic, ks_p_value)
 
             # Save Chi-Squared Test Results
             save_chi2_results(output_file, run_id, step, observed, expected, chi2_stat, p_value)
 
 
-def task_1_2(total_steps=10000, checkpoints=[1000, 10000], run_id=1):
+def task_1_2(total_steps=100000, checkpoints=[1000, 10000,100000], run_id=1):
     """Simulate movement in 8 directions for 1000 and 10000 steps with checkpoints for uniformity analysis."""
     grid_size = 100
     directions_map = {
@@ -261,39 +232,12 @@ def plot_simulation_results_8(results, output_file="simulation_results_task_1_2.
             axs[1, 0].set_xlabel('Chi-Squared Value')
             axs[1, 0].set_ylabel('Density')
             axs[1, 0].grid(True)
+            axs[1, 1].axis('off')  # Hides the subplot (1, 1)
 
-            # Perform Kolmogorov-Smirnov test and print the results
-            observed_probabilities = np.array([counts.get(direction, 0) / step for direction in directions_map.values()])
-            
-            # Compute the CDF for observed and expected (uniform) distributions
-            observed_cdf = np.cumsum(observed_probabilities)
-            expected_cdf = np.cumsum([1/8] * 8)  # Uniform distribution CDF for 8 directions
-            
-            # Perform KS test
-            ks_statistic, ks_p_value = kstest(observed_cdf, 'uniform')
-            
-            print(f"\nKolmogorov-Smirnov Test Results (Run {run_id}, Checkpoint {step}):")
-            print(f"Observed CDF: {observed_cdf}")
-            print(f"Expected CDF: {expected_cdf}")
-            print(f"KS Statistic: {ks_statistic:.4f}, p-value: {ks_p_value:.4f}")
-            if ks_p_value > 0.05:
-                print("Result: The data is consistent with a uniform distribution (p > 0.05) according to the KS test.")
-            else:
-                print("Result: The data significantly deviates from a uniform distribution (p ≤ 0.05) according to the KS test.")
-
-            # KS Test (CDF plot) and KS Statistic (fourth subplot)
-            axs[1, 1].plot(list(directions_map.values()), observed_cdf, label="Observed CDF", color='b', marker='o')
-            axs[1, 1].plot(list(directions_map.values()), expected_cdf, label="Expected CDF (Uniform)", color='r', linestyle='--')
-            axs[1, 1].set_title(f"KS Test: CDF of Observed vs Expected (Checkpoint {step})")
-            axs[1, 1].set_xlabel("Direction")
-            axs[1, 1].set_ylabel("CDF")
-            axs[1, 1].legend()
-            axs[1, 1].grid(True)
 
             # Automatically adjust layout to avoid overlapping elements
             plt.tight_layout()
             plt.show()
-            save_ks_results(output_file, run_id, step, ks_statistic, ks_p_value)
 
             # Save Chi-Squared Test Results
             save_chi2_results(output_file, run_id, step, observed, expected, chi2_stat, p_value)
