@@ -1,36 +1,36 @@
 Chi-Squared Test Results (Run 1, Checkpoint 100):
-Observed Frequencies: [28, 22, 24, 26]
+Observed Frequencies: [22, 29, 18, 31]
 Expected Frequencies: [25.0, 25.0, 25.0, 25.0]
-Chi-Squared Statistic: 0.8000, p-value: 0.8495
+Chi-Squared Statistic: 4.4000, p-value: 0.2214
 Result: The data is consistent with a uniform distribution (p > 0.05).
 
 Chi-Squared Test Results (Run 1, Checkpoint 10000):
-Observed Frequencies: [2512, 2497, 2474, 2517]
+Observed Frequencies: [2544, 2502, 2475, 2479]
 Expected Frequencies: [2500.0, 2500.0, 2500.0, 2500.0]
-Chi-Squared Statistic: 0.4472, p-value: 0.9303
+Chi-Squared Statistic: 1.2024, p-value: 0.7524
 Result: The data is consistent with a uniform distribution (p > 0.05).
 
 Chi-Squared Test Results (Run 2, Checkpoint 100):
-Observed Frequencies: [26, 25, 21, 28]
+Observed Frequencies: [26, 29, 24, 21]
 Expected Frequencies: [25.0, 25.0, 25.0, 25.0]
-Chi-Squared Statistic: 1.0400, p-value: 0.7916
+Chi-Squared Statistic: 1.3600, p-value: 0.7149
 Result: The data is consistent with a uniform distribution (p > 0.05).
 
 Chi-Squared Test Results (Run 2, Checkpoint 10000):
-Observed Frequencies: [2492, 2481, 2462, 2565]
+Observed Frequencies: [2455, 2572, 2519, 2454]
 Expected Frequencies: [2500.0, 2500.0, 2500.0, 2500.0]
-Chi-Squared Statistic: 2.4376, p-value: 0.4867
+Chi-Squared Statistic: 3.8744, p-value: 0.2753
 Result: The data is consistent with a uniform distribution (p > 0.05).
 
 Chi-Squared Test Results (Run 3, Checkpoint 100):
-Observed Frequencies: [22, 21, 29, 28]
+Observed Frequencies: [17, 20, 25, 38]
 Expected Frequencies: [25.0, 25.0, 25.0, 25.0]
-Chi-Squared Statistic: 2.0000, p-value: 0.5724
-Result: The data is consistent with a uniform distribution (p > 0.05).
+Chi-Squared Statistic: 10.3200, p-value: 0.0160
+Result: The data is not consistent with a uniform distribution (p < 0.05).
 
 Chi-Squared Test Results (Run 3, Checkpoint 10000):
-Observed Frequencies: [2438, 2542, 2485, 2535]
+Observed Frequencies: [2464, 2448, 2542, 2546]
 Expected Frequencies: [2500.0, 2500.0, 2500.0, 2500.0]
-Chi-Squared Statistic: 2.8232, p-value: 0.4197
+Chi-Squared Statistic: 3.1520, p-value: 0.3688
 Result: The data is consistent with a uniform distribution (p > 0.05).
 
